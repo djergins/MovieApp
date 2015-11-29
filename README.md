@@ -10,9 +10,9 @@ To Run: make sure all files are in the same directory and run from entertainment
 
 Modifications from the original:
 Added additional content to the modal aside from the trailer:
-Movie Title
-Rating
-Release Date 
+Movie Title,
+Rating,
+Release Date,
 Cast
 
 Added parameters to the movie object:
