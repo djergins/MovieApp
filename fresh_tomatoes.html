@@ -1,9 +1,4 @@
-import webbrowser
-import os
-import re
 
-# Styles and scripting for the page
-main_page_head = '''
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +55,6 @@ main_page_head = '''
         $(document).on('click', '.hanging-close, .modal-backdrop, .modal', function (event) {
             // Remove the src so the player itself gets removed, as this is the only
             // reliable way to ensure the video stops playing in IE
-            // hide modal on click
         $('#trailer').modal('hide');
         $("#trailer-video-container").empty();         
         });
@@ -102,11 +96,7 @@ main_page_head = '''
         });
     </script>
 </head>
-'''
 
-
-# The main page layout and title bar
-main_page_content = '''
   <body>
   <!-- Trailer Video Modal -->
     <div class="modal" id="trailer">
@@ -133,63 +123,55 @@ main_page_content = '''
       </div>
     </div>
     <div class="container">
-      {movie_tiles}
+      
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="EXeTwQWrcwY" data-movie-title="The Dark Knight"
+data-release-date="July 18, 2008" data-cast="Christian Bale, Heath Ledger, Aaron Eckhart, Michael Caine, Maggie Gyllenhaal, Gary Oldman, Morgan Freeman" 
+data-rating="PG-13" data-toggle="modal" data-target="#trailer">
+    <img src="https://upload.wikimedia.org/wikipedia/en/8/8a/Dark_Knight.jpg" width="220" height="342">
+    <h2>The Dark Knight</h2>
+</div>
+
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="tmeOjFno6Do" data-movie-title="Avengers: Age of Ultron"
+data-release-date="May 1, 2015" data-cast="Robert Downey Jr., Chris Hemsworth, Mark Ruffalo, Chris Evans, Scarlett Johansson, Jeremy Renner, James Spader, Samuel L. Jackson" 
+data-rating="PG-13" data-toggle="modal" data-target="#trailer">
+    <img src="http://i2.wp.com/bitcast-a-sm.bitgravity.com/slashfilm/wp/wp-content/images/Avengers-Age-of-Ultron-Poster.jpg" width="220" height="342">
+    <h2>Avengers: Age of Ultron</h2>
+</div>
+
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="YWwAOutgWBQ" data-movie-title="A Beautiful Mind"
+data-release-date="December 21, 2001" data-cast="Russell Crowe, Ed Harris, Jennifer Connelly, Christopher Plummer, Paul Bettany" 
+data-rating="PG-13" data-toggle="modal" data-target="#trailer">
+    <img src="https://upload.wikimedia.org/wikipedia/en/b/b8/A_Beautiful_Mind_Poster.jpg" width="220" height="342">
+    <h2>A Beautiful Mind</h2>
+</div>
+
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="B16Bo47KS2g" data-movie-title="Guardians of the Galaxy"
+data-release-date="August 1, 2014" data-cast="Chris Pratt, Zoe Saldana, Dave Bautista, Vin Diesel, Bradley Cooper, Lee Pace" 
+data-rating="PG-13" data-toggle="modal" data-target="#trailer">
+    <img src="http://1.media.dorkly.cvcdn.com/26/95/18b149286ca6f2920e017bd5d2ffcbf5.jpg" width="220" height="342">
+    <h2>Guardians of the Galaxy</h2>
+</div>
+
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="L9szn1QQfas" data-movie-title="TRON: LEGACY"
+data-release-date="December 17, 2010" data-cast="Jeff Bridges, Garrett Hedlund, Olivia Wilde, Bruce Boxleitner" 
+data-rating="PG" data-toggle="modal" data-target="#trailer">
+    <img src="http://www.impawards.com/2010/posters/tron_legacy_ver11.jpg" width="220" height="342">
+    <h2>TRON: LEGACY</h2>
+</div>
+
+<div class="col-md-6 col-lg-4 movie-tile text-center" 
+data-trailer-youtube-id="7wd5KEaOtm4" data-movie-title="Scott Pilgrim Vs. The World"
+data-release-date="August 13, 2010" data-cast="Michael Cera, Mary Elizabeth Winstead, Kieran Culkin, Chris Evans, Anna Kendrick" 
+data-rating="PG-13" data-toggle="modal" data-target="#trailer">
+    <img src="http://images.moviepostershop.com/scott-pilgrim-vs-the-world-movie-poster-2010-1020561018.jpg" width="220" height="342">
+    <h2>Scott Pilgrim Vs. The World</h2>
+</div>
+
     </div>
   </body>
 </html>
-'''
-
-
-# A single movie entry html template
-movie_tile_content = '''
-<div class="col-md-6 col-lg-4 movie-tile text-center" 
-data-trailer-youtube-id="{trailer_youtube_id}" data-movie-title="{movie_title}"
-data-release-date="{release_date}" data-cast="{cast}" 
-data-rating="{movie_rating}" data-toggle="modal" data-target="#trailer">
-    <img src="{poster_image_url}" width="220" height="342">
-    <h2>{movie_title}</h2>
-</div>
-'''
-
-
-def create_movie_tiles_content(movies):
-    # The HTML content for this section of the page
-    content = ''
-    for movie in movies:
-        # Extract the youtube ID from the url
-        youtube_id_match = re.search(
-            r'(?<=v=)[^&#]+', movie.trailer_youtube_url)
-        youtube_id_match = youtube_id_match or re.search(
-            r'(?<=be/)[^&#]+', movie.trailer_youtube_url)
-        trailer_youtube_id = (youtube_id_match.group(0) if youtube_id_match
-                              else None)
-
-        # Append the tile for the movie with its content filled in
-        # Also makes movie parameters for release date, cast, and movie rating 
-        # available to the trailer modal.
-        content += movie_tile_content.format(
-            movie_title=movie.title,
-            poster_image_url=movie.poster_image_url,
-            trailer_youtube_id=trailer_youtube_id,
-            release_date=movie.release_date,
-            cast=", ".join(movie.cast),
-            movie_rating=movie.rating)    
-    return content
-
-
-def open_movies_page(movies):
-    # Create or overwrite the output file
-    output_file = open('fresh_tomatoes.html', 'w')
-
-    # Replace the movie tiles placeholder generated content
-    rendered_content = main_page_content.format(
-        movie_tiles=create_movie_tiles_content(movies)
-       )
-
-    # Output the file
-    output_file.write(main_page_head + rendered_content)
-    output_file.close()
-
-    # open the output file in the browser (in a new tab, if possible)
-    url = os.path.abspath(output_file.name)
-    webbrowser.open('file://' + url, new=2)
